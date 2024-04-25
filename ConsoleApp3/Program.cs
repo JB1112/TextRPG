@@ -15,28 +15,30 @@ namespace ConsoleApp3
         static List<ItemData> playerEquipped = new List<ItemData>(); //플레이어 장착 인벤토리 작성
         static void Items()
         {
-            itemDatas.Add(new ItemData(1, "수련자 갑옷", 0, 5, "수련에 도움을 주는 갑옷입니다."));
-            itemDatas.Add(new ItemData(2, "무쇠갑옷", 0, 9, "질긴 천을 덧대어 제작한 낡은 갑옷입니다."));
-            itemDatas.Add(new ItemData(3, "스파르타의 갑옷", 0, 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다."));
-            itemDatas.Add(new ItemData(4, "낡은 검", 2, 0, "쉽게 볼 수 있는 낡은 검 입니다."));
-            itemDatas.Add(new ItemData(5, "청동 도끼", 5, 0, "어디선가 사용됐던거 같은 도끼입니다."));
-            itemDatas.Add(new ItemData(6, "스파르타의 창", 7, 0, "스파르타의 전사들이 사용했다는 전설의 창입니다."));
+            itemDatas.Add(new ItemData(1, "수련자 갑옷",0, 0, 5, "수련에 도움을 주는 갑옷입니다."));
+            itemDatas.Add(new ItemData(2, "무쇠갑옷", 0, 0, 9, "질긴 천을 덧대어 제작한 낡은 갑옷입니다."));
+            itemDatas.Add(new ItemData(3, "스파르타의 갑옷", 0, 0, 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다."));
+            itemDatas.Add(new ItemData(4, "낡은 검",1, 2, 0, "쉽게 볼 수 있는 낡은 검 입니다."));
+            itemDatas.Add(new ItemData(5, "청동 도끼",1, 5, 0, "어디선가 사용됐던거 같은 도끼입니다."));
+            itemDatas.Add(new ItemData(6, "스파르타의 창",1, 7, 0, "스파르타의 전사들이 사용했다는 전설의 창입니다."));
         }
-        public class ItemData
+        public class ItemData //아이템 데이터 작성
         {
             public int ItemId;
             public string ItemName;
             public int ItemPower;
             public int ItemDef;
             public string ItemComment;
-            public bool PlayerEquipped;
+            public int Itemtype; // 0 = 방어구 1 =  무기
+            public bool PlayerEquipped; //장착유무 체크
 
-            public ItemData(int itemId, string itemName, int itempower, int itemDefense, string itemComment)
+            public ItemData(int itemId, string itemName, int itemtype, int itempower, int itemDefense, string itemComment)
             {
                 ItemId = itemId;
                 ItemName = itemName;
                 ItemPower = itempower;
                 ItemDef = itemDefense;
+                Itemtype = itemtype;
                 ItemComment = itemComment;
                 PlayerEquipped = false;
             }
@@ -77,11 +79,11 @@ namespace ConsoleApp3
         }
         static void PlusItemStat(ItemData item)
         {
-            if (item.ItemPower > 0 && item.ItemDef == 0)
+            if (item.Itemtype == 1)
             {
                 Console.Write($"| 공격력 + {item.ItemPower} |");
             }
-            else if (item.ItemPower == 0 && item.ItemDef > 0)
+            else if (item.Itemtype == 0)
             {
                 Console.Write($"| 방어력 + {item.ItemDef} |");
             }
@@ -127,14 +129,33 @@ namespace ConsoleApp3
         static void ChangeEquip(ItemData item)
         {
             if(item.PlayerEquipped == false)
-            { 
-                item.PlayerEquipped = true;
-                if (item.ItemPower > 0 && item.ItemDef == 0)
+            {
+                if (item.Itemtype == 1)
                 {
+                    for (int i = 1; i < itemDatas.Count + 1; i++)
+                    {
+                        ItemData checkitem = itemDatas[i - 1];
+                        if(checkitem.PlayerEquipped == true && checkitem.Itemtype == 1)
+                        {
+                            checkitem.PlayerEquipped = false;
+                            player.Power = player.BasePower.ToString();
+                        }
+                    }
+                    item.PlayerEquipped = true;
                     player.Power = player.Power + $"[+{item.ItemPower}]";
                 }
-                else if (item.ItemPower == 0 && item.ItemDef > 0)
+                else if (item.Itemtype == 0)
                 {
+                    for (int i = 1; i < itemDatas.Count+1; i++)
+                    {
+                        ItemData checkitem = itemDatas[i - 1];
+                        if (checkitem.PlayerEquipped == true && checkitem.Itemtype == 0)
+                        {
+                            checkitem.PlayerEquipped = false;
+                            player.Defence = player.BaseDefence.ToString();
+                        }
+                    }
+                    item.PlayerEquipped = true;
                     player.Defence = player.Defence + $"[+{item.ItemDef}]";
                 }
             }
@@ -142,13 +163,13 @@ namespace ConsoleApp3
             {
                 item.PlayerEquipped = false;
 
-                if (item.ItemPower > 0 && item.ItemDef == 0)
+                if (item.Itemtype == 1)
                 {
                     player.Power = player.BasePower.ToString();
                 }
-                else if (item.ItemPower == 0 && item.ItemDef > 0)
+                else if (item.Itemtype == 0)
                 {
-                    player.Defence = player.BasePower.ToString();
+                    player.Defence = player.BaseDefence.ToString();
                 }
             }
             
